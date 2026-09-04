@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## Usage
+
+            ```hcl
+            module "ssr_cloudfront_support" {
+              source  = "pomo-studio/ssr-cloudfront-support/aws"
+              version = "~> 0.1"
+
+              app_name = "my-app"
+            }
+            ```
+
+            ## Full Documentation
+
+            See [README.md](https://github.com/pomo-studio/terraform-aws-ssr-cloudfront-support/blob/${{ steps.get_version.outputs.VERSION }}/README.md) for complete documentation.
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(steps.get_version.outputs.VERSION, 'alpha') || contains(steps.get_version.outputs.VERSION, 'beta') || contains(steps.get_version.outputs.VERSION, 'rc') }}
