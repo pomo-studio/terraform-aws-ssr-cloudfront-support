@@ -38,7 +38,8 @@ resource "aws_cloudfront_origin_request_policy" "lambda_signed" {
         "content-type",
         "origin",
         "referer",
-        "user-agent"
+        "user-agent",
+        "x-amz-content-sha256"
       ]
     }
   }
