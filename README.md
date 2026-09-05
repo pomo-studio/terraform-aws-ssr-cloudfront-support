@@ -13,18 +13,25 @@ This module provisions:
 - Origin request policy for signed Lambda origin requests
 - Cache policy tuned for SSR stale-while-revalidate behavior
 
+
+## Maintaining This Module
+
+The generated interface below is authoritative for requirements, providers, resources, inputs, and outputs. Regenerate with `terraform-docs` **v0.20.0**: `terraform-docs .`. CI fails on drift; keep explanatory prose outside the generated markers.
+
+See the [contribution guide](https://github.com/pomo-studio/.github/blob/main/CONTRIBUTING.md) and [security policy](https://github.com/pomo-studio/.github/blob/main/SECURITY.md). PR validation does not prove a live plan or deployment. Infrastructure plans and applies belong in Terraform Cloud; never provide cloud credentials to untrusted PR code.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0, < 7.0 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 6.63.0 |
 
 ## Modules
@@ -34,7 +41,7 @@ No modules.
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [aws_cloudfront_cache_policy.ssr_swr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_cache_policy) | resource |
 | [aws_cloudfront_origin_access_control.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_control) | resource |
 | [aws_cloudfront_origin_access_identity.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_origin_access_identity) | resource |
@@ -43,13 +50,13 @@ No modules.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_app_name"></a> [app\_name](#input\_app\_name) | Normalized app name for support resource naming | `string` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_lambda_oac_id"></a> [lambda\_oac\_id](#output\_lambda\_oac\_id) | n/a |
 | <a name="output_lambda_signed_origin_request_policy_id"></a> [lambda\_signed\_origin\_request\_policy\_id](#output\_lambda\_signed\_origin\_request\_policy\_id) | n/a |
 | <a name="output_oai_cloudfront_access_identity_path"></a> [oai\_cloudfront\_access\_identity\_path](#output\_oai\_cloudfront\_access\_identity\_path) | n/a |
