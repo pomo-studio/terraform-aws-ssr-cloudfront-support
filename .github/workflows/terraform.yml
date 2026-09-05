@@ -8,6 +8,7 @@ on:
       - '**.tfvars'
       - '.tflint.hcl'
       - '.github/workflows/terraform.yml'
+      - '.github/workflows/interface-docs.yml'
       - 'CHANGELOG.md'
       - '.terraform-docs.yml'
   pull_request:
@@ -17,6 +18,7 @@ on:
       - '**.tfvars'
       - '.tflint.hcl'
       - '.github/workflows/terraform.yml'
+      - '.github/workflows/interface-docs.yml'
       - 'CHANGELOG.md'
       - '.terraform-docs.yml'
   workflow_dispatch:
@@ -82,17 +84,3 @@ jobs:
 
       - name: Run TFLint
         run: tflint -f compact --recursive
-
-  docs:
-    name: Docs Check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-      - name: terraform-docs check
-        uses: terraform-docs/gh-actions@v1.4.1
-        with:
-          working-dir: .
-          output-file: README.md
-          output-method: inject
-          args: --check
