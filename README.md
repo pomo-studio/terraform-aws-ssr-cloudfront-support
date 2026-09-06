@@ -50,9 +50,9 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_lambda_oac_id"></a> [lambda\_oac\_id](#output\_lambda\_oac\_id) | n/a |
-| <a name="output_lambda_signed_origin_request_policy_id"></a> [lambda\_signed\_origin\_request\_policy\_id](#output\_lambda\_signed\_origin\_request\_policy\_id) | n/a |
-| <a name="output_oai_cloudfront_access_identity_path"></a> [oai\_cloudfront\_access\_identity\_path](#output\_oai\_cloudfront\_access\_identity\_path) | n/a |
-| <a name="output_oai_s3_canonical_user_id"></a> [oai\_s3\_canonical\_user\_id](#output\_oai\_s3\_canonical\_user\_id) | n/a |
-| <a name="output_ssr_swr_cache_policy_id"></a> [ssr\_swr\_cache\_policy\_id](#output\_ssr\_swr\_cache\_policy\_id) | n/a |
+| <a name="output_lambda_oac_id"></a> [lambda\_oac\_id](#output\_lambda\_oac\_id) | Origin access control ID used to sign CloudFront requests to Lambda function URLs. |
+| <a name="output_lambda_signed_origin_request_policy_id"></a> [lambda\_signed\_origin\_request\_policy\_id](#output\_lambda\_signed\_origin\_request\_policy\_id) | Origin request policy ID for Lambda origins, controlling which headers, cookies and query strings are forwarded. |
+| <a name="output_oai_cloudfront_access_identity_path"></a> [oai\_cloudfront\_access\_identity\_path](#output\_oai\_cloudfront\_access\_identity\_path) | Origin access identity path, passed to a distribution so it can read from private S3 origins. |
+| <a name="output_oai_s3_canonical_user_id"></a> [oai\_s3\_canonical\_user\_id](#output\_oai\_s3\_canonical\_user\_id) | Canonical user ID of the origin access identity, used in S3 bucket policies to grant CloudFront read access. |
+| <a name="output_ssr_swr_cache_policy_id"></a> [ssr\_swr\_cache\_policy\_id](#output\_ssr\_swr\_cache\_policy\_id) | Cache policy ID providing stale-while-revalidate caching for SSR responses. |
 <!-- END_TF_DOCS -->
