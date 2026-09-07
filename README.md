@@ -1,33 +1,22 @@
 # terraform-aws-ssr-cloudfront-support
 
-The cache policies, origin request policies and origin access controls that a serverless
-SSR distribution needs. Separated from the distribution itself because these are
-account-level, reusable, and slow to change.
+The policies a server-rendered CloudFront distribution needs: what to cache, what to
+forward to the origin, and how to reach private Lambda and S3 origins.
 
-Composed by [`serverless-ssr`](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws)
-and consumed by [`ssr-cloudfront`](https://registry.terraform.io/modules/pomo-studio/ssr-cloudfront/aws),
-which takes every one of this module's outputs as an input.
+**You probably want [serverless-ssr](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws) instead.**
+This module exists so the distribution can stay focused on routing. On its own it creates
+no distribution and serves no traffic.
 
-## What it creates
+## What you get
 
-| Resource | Purpose |
+| | |
 |---|---|
-| Origin access control | Signs CloudFront requests to Lambda function URLs |
-| Origin access identity | Lets CloudFront read from private S3 buckets |
-| Cache policy | Stale-while-revalidate caching for SSR responses |
-| Origin request policy | Controls which headers, cookies and query strings reach the Lambda |
+| Origin access control | Lets CloudFront call a Lambda function URL |
+| Origin access identity | Lets CloudFront read a private S3 bucket |
+| Cache policy | Caches server-rendered pages, and serves a stale copy while refreshing |
+| Origin request policy | Decides which headers, cookies and query strings reach the Lambda |
 
-## Design decisions
-
-**The cache policy honours the origin.** It forwards `Cache-Control` from the Lambda
-rather than imposing a fixed TTL, so freshness is an application decision.
-
-**The origin request policy forwards a whitelist, not everything.** `accept`,
-`accept-language`, `cache-control`, `content-type`, `origin`, `referer` and `user-agent`.
-Forwarding more would fragment the cache; forwarding `host` is not possible, because a
-Lambda function URL behind OAC requires its own host for SigV4 signing.
-
-## Usage
+## Using it
 
 ```hcl
 module "cloudfront_support" {
@@ -40,11 +29,10 @@ module "cloudfront_support" {
 }
 ```
 
-Then pass its outputs to the distribution and the buckets:
+Then hand its outputs to the distribution and the buckets:
 
 ```hcl
 module "cloudfront" {
-  source = "pomo-studio/ssr-cloudfront/aws"
   # ...
   lambda_oac_id                          = module.cloudfront_support.lambda_oac_id
   oai_cloudfront_access_identity_path    = module.cloudfront_support.oai_cloudfront_access_identity_path
@@ -53,16 +41,23 @@ module "cloudfront" {
 }
 
 module "storage" {
-  source = "pomo-studio/ssr-storage/aws"
   # ...
   cloudfront_oai_canonical_user_id = module.cloudfront_support.oai_s3_canonical_user_id
 }
 ```
 
-## Notes
+## Worth knowing
 
-Policy names are derived from `app_name` and must be unique within the account. Deploying
-two stacks with the same `app_name` in one account will conflict.
+**Your app decides how long a page is cached.** The cache policy passes through the
+`Cache-Control` header your Lambda sends rather than imposing a fixed time, so freshness
+is a decision you make in code.
+
+**Only seven headers reach the origin**, on purpose. Forwarding more splits the cache and
+lowers your hit rate. `host` is not among them and cannot be — a Lambda function URL
+needs its own hostname to verify the request signature.
+
+**Names come from `app_name`.** Two stacks sharing an `app_name` in one AWS account will
+collide.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
