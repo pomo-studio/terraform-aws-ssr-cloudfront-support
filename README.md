@@ -1,17 +1,63 @@
 # terraform-aws-ssr-cloudfront-support
 
-[![Terraform Validation](https://github.com/pomo-studio/terraform-aws-ssr-cloudfront-support/actions/workflows/terraform.yml/badge.svg)](https://github.com/pomo-studio/terraform-aws-ssr-cloudfront-support/actions/workflows/terraform.yml)
-[![Terraform Registry](https://img.shields.io/badge/terraform-registry-844FBA?logo=terraform)](https://registry.terraform.io/modules/pomo-studio/ssr-cloudfront-support/aws)
+The policies a server-rendered CloudFront distribution needs: what to cache, what to
+forward to the origin, and how to reach private Lambda and S3 origins.
 
-- [Changelog](CHANGELOG.md)
+**You probably want [serverless-ssr](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws) instead.**
+This module exists so the distribution can stay focused on routing. On its own it creates
+no distribution and serves no traffic.
 
-Reusable CloudFront support resources for SSR stacks.
+## What you get
 
-This module provisions:
-- CloudFront Origin Access Identity for S3 origins
-- CloudFront Origin Access Control for Lambda Function URL origins
-- Origin request policy for signed Lambda origin requests
-- Cache policy tuned for SSR stale-while-revalidate behavior
+| | |
+|---|---|
+| Origin access control | Lets CloudFront call a Lambda function URL |
+| Origin access identity | Lets CloudFront read a private S3 bucket |
+| Cache policy | Caches server-rendered pages, and serves a stale copy while refreshing |
+| Origin request policy | Decides which headers, cookies and query strings reach the Lambda |
+
+## Using it
+
+```hcl
+module "cloudfront_support" {
+  source  = "pomo-studio/ssr-cloudfront-support/aws"
+  version = "~> 0.2"
+
+  providers = { aws = aws.primary }
+
+  app_name = "my-app"
+}
+```
+
+Then hand its outputs to the distribution and the buckets:
+
+```hcl
+module "cloudfront" {
+  # ...
+  lambda_oac_id                          = module.cloudfront_support.lambda_oac_id
+  oai_cloudfront_access_identity_path    = module.cloudfront_support.oai_cloudfront_access_identity_path
+  lambda_signed_origin_request_policy_id = module.cloudfront_support.lambda_signed_origin_request_policy_id
+  ssr_swr_cache_policy_id                = module.cloudfront_support.ssr_swr_cache_policy_id
+}
+
+module "storage" {
+  # ...
+  cloudfront_oai_canonical_user_id = module.cloudfront_support.oai_s3_canonical_user_id
+}
+```
+
+## Worth knowing
+
+**Your app decides how long a page is cached.** The cache policy passes through the
+`Cache-Control` header your Lambda sends rather than imposing a fixed time, so freshness
+is a decision you make in code.
+
+**Only seven headers reach the origin**, on purpose. Forwarding more splits the cache and
+lowers your hit rate. `host` is not among them and cannot be — a Lambda function URL
+needs its own hostname to verify the request signature.
+
+**Names come from `app_name`.** Two stacks sharing an `app_name` in one AWS account will
+collide.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
