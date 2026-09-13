@@ -9,9 +9,9 @@ The policies a server-rendered CloudFront distribution needs: what to cache, wha
 
 ## When to use it
 
-Use this component when you are assembling the SSR delivery stack yourself and need the CloudFront support policies, rather than hand-writing origin access control, cache, and origin request policies. It pairs with `pomo-studio/ssr-cloudfront/aws`, `ssr-lambda/aws`, and `ssr-storage/aws`.
+Create the CloudFront support policies instead of hand-writing them: origin access control for a Lambda function URL, an origin access identity for a private S3 bucket, a cache policy, and an origin request policy. Use it for any distribution that reads from a Lambda function URL and a private bucket.
 
-If you want a working site rather than the parts, use [`pomo-studio/serverless-ssr/aws`](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws); it wires this in for you. On its own this component serves no traffic.
+It is also the policy layer of the [Serverless SSR blueprint](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws). On its own it serves no traffic; it exists so the distribution can stay focused on routing.
 
 ## Quickstart
 
