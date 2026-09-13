@@ -1,22 +1,19 @@
 # terraform-aws-ssr-cloudfront-support
 
-The policies a server-rendered CloudFront distribution needs: what to cache, what to
-forward to the origin, and how to reach private Lambda and S3 origins.
+[![Terraform Validation](https://github.com/pomo-studio/terraform-aws-ssr-cloudfront-support/actions/workflows/terraform.yml/badge.svg)](https://github.com/pomo-studio/terraform-aws-ssr-cloudfront-support/actions/workflows/terraform.yml)
+[![Terraform Registry](https://img.shields.io/badge/terraform-registry-844FBA?logo=terraform)](https://registry.terraform.io/modules/pomo-studio/ssr-cloudfront-support/aws)
 
-**You probably want [serverless-ssr](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws) instead.**
-This module exists so the distribution can stay focused on routing. On its own it creates
-no distribution and serves no traffic.
+[Changelog](CHANGELOG.md)
 
-## What you get
+The policies a server-rendered CloudFront distribution needs: what to cache, what to forward to the origin, and how to reach private Lambda and S3 origins.
 
-| | |
-|---|---|
-| Origin access control | Lets CloudFront call a Lambda function URL |
-| Origin access identity | Lets CloudFront read a private S3 bucket |
-| Cache policy | Caches server-rendered pages, and serves a stale copy while refreshing |
-| Origin request policy | Decides which headers, cookies and query strings reach the Lambda |
+## When to use it
 
-## Using it
+Use this component when you are assembling the SSR delivery stack yourself and need the CloudFront support policies, rather than hand-writing origin access control, cache, and origin request policies. It pairs with `pomo-studio/ssr-cloudfront/aws`, `ssr-lambda/aws`, and `ssr-storage/aws`.
+
+If you want a working site rather than the parts, use [`pomo-studio/serverless-ssr/aws`](https://registry.terraform.io/modules/pomo-studio/serverless-ssr/aws); it wires this in for you. On its own this component serves no traffic.
+
+## Quickstart
 
 ```hcl
 module "cloudfront_support" {
@@ -29,7 +26,7 @@ module "cloudfront_support" {
 }
 ```
 
-Then hand its outputs to the distribution and the buckets:
+Hand the outputs to the distribution and the buckets:
 
 ```hcl
 module "cloudfront" {
@@ -46,18 +43,20 @@ module "storage" {
 }
 ```
 
-## Worth knowing
+## What it creates
 
-**Your app decides how long a page is cached.** The cache policy passes through the
-`Cache-Control` header your Lambda sends rather than imposing a fixed time, so freshness
-is a decision you make in code.
+| | |
+|---|---|
+| Origin access control | Lets CloudFront sign requests to a Lambda function URL |
+| Origin access identity | Lets CloudFront read a private S3 bucket |
+| Cache policy | Caches server-rendered pages, and serves a stale copy while refreshing |
+| Origin request policy | Decides which headers, cookies and query strings reach the Lambda |
 
-**Only seven headers reach the origin**, on purpose. Forwarding more splits the cache and
-lowers your hit rate. `host` is not among them and cannot be: a Lambda function URL
-needs its own hostname to verify the request signature.
+## Design decisions
 
-**Names come from `app_name`.** Two stacks sharing an `app_name` in one AWS account will
-collide.
+- **The app decides freshness.** The cache policy passes through the `Cache-Control` header your Lambda sends rather than imposing a fixed time, so caching is a decision you make in code.
+- **Only seven headers reach the origin.** Forwarding more splits the cache and lowers the hit rate. `host` is not among them and cannot be, because a Lambda function URL needs its own hostname to verify the signed request.
+- **Names come from `app_name`.** Two stacks sharing an `app_name` in one AWS account collide, so keep it unique.
 
 ## Reference
 
@@ -109,3 +108,11 @@ No modules.
 <!-- END_TF_DOCS -->
 
 </details>
+
+## Support and license
+
+Part of the [pomo-studio](https://github.com/pomo-studio) Terraform components, run in production by [postmodern.](https://pomo.studio). Regenerate the reference with `terraform-docs` v0.20.0 (`terraform-docs .`); CI fails on drift.
+
+See the [contribution guide](https://github.com/pomo-studio/.github/blob/main/CONTRIBUTING.md) and [security policy](https://github.com/pomo-studio/.github/blob/main/SECURITY.md).
+
+MIT licensed. See [LICENSE](LICENSE).
