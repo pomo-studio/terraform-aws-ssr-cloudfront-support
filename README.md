@@ -53,11 +53,16 @@ module "storage" {
 is a decision you make in code.
 
 **Only seven headers reach the origin**, on purpose. Forwarding more splits the cache and
-lowers your hit rate. `host` is not among them and cannot be — a Lambda function URL
+lowers your hit rate. `host` is not among them and cannot be: a Lambda function URL
 needs its own hostname to verify the request signature.
 
 **Names come from `app_name`.** Two stacks sharing an `app_name` in one AWS account will
 collide.
+
+## Reference
+
+<details>
+<summary>Reference</summary>
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -102,3 +107,5 @@ No modules.
 | <a name="output_oai_s3_canonical_user_id"></a> [oai\_s3\_canonical\_user\_id](#output\_oai\_s3\_canonical\_user\_id) | Canonical user ID of the origin access identity, used in S3 bucket policies to grant CloudFront read access. |
 | <a name="output_ssr_swr_cache_policy_id"></a> [ssr\_swr\_cache\_policy\_id](#output\_ssr\_swr\_cache\_policy\_id) | Cache policy ID providing stale-while-revalidate caching for SSR responses. |
 <!-- END_TF_DOCS -->
+
+</details>
